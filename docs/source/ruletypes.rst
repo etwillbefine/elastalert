@@ -1629,10 +1629,10 @@ The OpsGenie alert requires one option:
 Optional:
 
 ``opsgenie_account``: The OpsGenie account to integrate with.
-
 ``opsgenie_recipients``: A list OpsGenie recipients who will be notified by the alert.
 ``opsgenie_recipients_args``: Map of arguments used to format opsgenie_recipients.
 ``opsgenie_default_recipients``: List of default recipients to notify when the formatting of opsgenie_recipients is unsuccesful.
+``opsgenie_schedules``: A list of OpsGenie schedules to notify (useful for rotating teams on a schedule).
 ``opsgenie_teams``: A list of OpsGenie teams to notify (useful for schedules with escalation).
 ``opsgenie_teams_args``: Map of arguments used to format opsgenie_teams (useful for assigning the alerts to teams based on some data)
 ``opsgenie_default_teams``: List of default teams to notify when the formatting of opsgenie_teams is unsuccesful.

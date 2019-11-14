@@ -20,6 +20,9 @@ class OpsGenieAlerter(Alerter):
         self.account = self.rule.get('opsgenie_account')
         self.api_key = self.rule.get('opsgenie_key', 'key')
         self.default_reciepients = self.rule.get('opsgenie_default_receipients', None)
+        self.schedules = self.rule.get('opsgenie_schedules', None)
+        self.schedule_args = self.rule.get('opsgenie_schedules_args', None)
+        self.default_schedules = self.rule.get('opsgenie_default_schedules', None)
         self.recipients = self.rule.get('opsgenie_recipients')
         self.recipients_args = self.rule.get('opsgenie_recipients_args')
         self.default_teams = self.rule.get('opsgenie_default_teams', None)
@@ -57,8 +60,8 @@ class OpsGenieAlerter(Alerter):
             responders = formated_responders
         return responders
 
-    def _fill_responders(self, responders, type_):
-        return [{'id': r, 'type': type_} for r in responders]
+    def _fill_responders(responders, prop, type_):
+        return [{prop: r, 'type': type_} for r in responders]
 
     def alert(self, matches):
         body = ''
@@ -73,15 +76,19 @@ class OpsGenieAlerter(Alerter):
         else:
             self.message = self.custom_message.format(**matches[0])
         self.recipients = self._parse_responders(self.recipients, self.recipients_args, matches, self.default_reciepients)
+        self.schedules = self._parse_responders(self.schedules, self.schedule_args, matches, self.default_schedules)
         self.teams = self._parse_responders(self.teams, self.teams_args, matches, self.default_teams)
         post = {}
         post['message'] = self.message
+        post['responders'] = []
         if self.account:
             post['user'] = self.account
         if self.recipients:
-            post['responders'] = [{'username': r, 'type': 'user'} for r in self.recipients]
+            post['responders'].extend(self._fill_responders(self.responders, 'username', 'user')
+        if self.schedules:
+            post['responders'].extend(self._fill_responders(self.schedules, 'name', 'schedule')
         if self.teams:
-            post['teams'] = [{'name': r, 'type': 'team'} for r in self.teams]
+            post['responders'].extend(self._fill_responders(self.teams, 'name', 'team')
         post['description'] = body
         post['source'] = 'ElastAlert'
 
